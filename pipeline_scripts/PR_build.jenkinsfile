@@ -10,7 +10,7 @@ pipeline
     }
     environment
     {
-        GIT_API_HEAD ="https://api.github.com/repos/abc-time-reporter/main-time-reporter"
+        GIT_API_HEAD ="https://api.github.com/repos/MashaYash/System-Admin-cw"
     }
     stages
     {
@@ -26,7 +26,7 @@ pipeline
                 script
                 {
                     def prResponse = httpRequest([
-                        authentication :"jenkins_service_user",
+                        authentication :"service_user",
                         url: "${GIT_API_HEAD}/pulls/${env.PR_no}",
                         validResponseCodes: '200'
                         
@@ -41,7 +41,7 @@ pipeline
                 script 
                 {
                     def commitResponse = httpRequest([
-                        authentication :"jenkins_service_user",
+                        authentication :"service_user",
                         url: "${GIT_API_HEAD}/pulls/${env.PR_no}/commits",
                         validResponseCodes: '200'
                     ])
@@ -77,7 +77,7 @@ pipeline
                     steps{
                         sh"""#!/bin/bash
                         set -e
-                        git clone --depth 1 --no-single-branch https://jenkins_service_user@github.com/abc-time-reporter/main-time-reporter.git revision-checkout
+                        git clone --depth 1 --no-single-branch https://service_user@github.com/MashaYash/System-Admin-cw.git revision-checkout
                         cd revision-checkout
                         git fetch origin "${env.commit_SHA}"
                         git checkout "${env.commit_SHA}"
@@ -90,7 +90,7 @@ pipeline
                     {
                         sh"""#!/bin/bash
                         set -e
-                        git clone --branch master --single-branch https://jenkins_service_user@github.com/abc-time-reporter/main-time-reporter.git master-checkout
+                        git clone --branch master --single-branch https://service_user@github.com/MashaYash/System-Admin-cw.git master-checkout
                         """
                     }
                 }
