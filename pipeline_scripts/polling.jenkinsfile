@@ -1,0 +1,77 @@
+pipeline
+{
+    agent any
+    environment 
+    {
+        GIT_API_HEAD ="https://api.github.com/repos/abc-time-reporter/main-time-reporter"
+        PR_number=''
+        job_done= false
+        PR_Id=0
+    }
+    stages
+    {
+        stage("get pull requests")
+        {
+            steps{
+                script 
+                {
+                    def response = httpRequest([
+                        authentication:"jenkins_service_user",
+                        url :"${GIT_API_HEAD}/pulls"
+
+                    ])
+                    echo "Status: ${response.status}"
+                    def json = readJSON text: response.content
+                    def pulls = json.values
+                    for (int pr in json)
+                    {
+                        echo "processing ${pr.statuses_url}"
+                            processPR(pr.number)
+                    }
+                }
+            }
+        }
+        
+    }
+}
+
+def processPR(PR_ID)
+{
+    def response = httpRequest([
+                    authentication:"jenkins_service_user",
+                    url :"${GIT_API_HEAD}/pulls/${PR_ID}/commits"
+
+                ])
+    
+    def json = readJSON text: response.content
+
+    def commitHash = json[-1].sha
+    def commitStatus = isCommitBuilt(commitHash)
+    if (!commitStatus)
+    {
+        triggerPR(PR_ID)
+    }
+}
+
+def isCommitBuilt(COMMIT_HASH)
+{
+    def response = httpRequest([
+                    authentication:"jenkins_service_user",
+                    url :"${GIT_API_HEAD}/commits/${COMMIT_HASH}/check-runs"
+
+                ])
+    
+    def json = readJSON text: response.content
+    if (json.total_count==0)
+    {
+        return false
+    }
+    return true
+}
+
+def triggerPR(PR_ID)
+{
+    echo "triggering build for :${PR_ID}"
+    def params1 =[string(name:'PR_no',value:"${PR_ID}")]
+    build job :"PRBuild",wait:false,parameters:params1 
+}
