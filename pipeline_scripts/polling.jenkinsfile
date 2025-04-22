@@ -16,7 +16,7 @@ pipeline
                 script 
                 {
                     def response = httpRequest([
-                        authentication:"jenkins_service_user",
+                        authentication:"github_service",
                         url :"${GIT_API_HEAD}/pulls"
 
                     ])
@@ -38,7 +38,7 @@ pipeline
 def processPR(PR_ID)
 {
     def response = httpRequest([
-                    authentication:"jenkins_service_user",
+                    authentication:"github_service",
                     url :"${GIT_API_HEAD}/pulls/${PR_ID}/commits"
 
                 ])
@@ -56,7 +56,7 @@ def processPR(PR_ID)
 def isCommitBuilt(COMMIT_HASH)
 {
     def response = httpRequest([
-                    authentication:"jenkins_service_user",
+                    authentication:"github_service",
                     url :"${GIT_API_HEAD}/commits/${COMMIT_HASH}/check-runs"
 
                 ])
