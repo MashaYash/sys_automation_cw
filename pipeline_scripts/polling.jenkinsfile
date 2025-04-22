@@ -3,7 +3,7 @@ pipeline
     agent any
     environment 
     {
-        GIT_API_HEAD ="https://api.github.com/repos/abc-time-reporter/main-time-reporter"
+        GIT_API_HEAD ="https://api.github.com/repos/MashaYash/System-Admin-cw"
         PR_number=''
         job_done= false
         PR_Id=0
